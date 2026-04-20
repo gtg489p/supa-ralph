@@ -27,13 +27,17 @@ Your job is to implement the next most important planned increment from `.supa-r
 
 ## Commit contract
 
-Use a structured commit message in this format:
+Resolve the commit-message prefix using this ladder, stopping at the first hit:
+
+1. If the environment variable `SUPA_RALPH_COMMIT_PREFIX` is set, use that value verbatim.
+2. Else if `.supa-ralph/config` exists and defines a `commit_prefix=<value>` line, use that value.
+3. Else default to `feat(ralph):` for feature increments or `fix(ralph):` for bug fixes.
+
+Append the completed increment summary after the prefix, for example:
 
 `feat(ralph): <completed increment summary>`
 
-If the change is a fix rather than a feature increment, use:
-
-`fix(ralph): <completed increment summary>`
+If the resolved prefix is already scoped (e.g., `chore(auth):`), use it directly without adding another scope.
 
 ## Guardrails
 
@@ -41,7 +45,8 @@ If the change is a fix rather than a feature increment, use:
 9999. No placeholders if the real implementation is feasible.
 99999. Keep `AGENTS.md` operational and brief. Status belongs in the plan and progress log.
 999999. If unrelated tests are already failing, either fix them if they block your increment or document them clearly in the plan.
-9999999. Prefer the strongest reasoning available for architecture and debugging, and use parallel subagents or parallel reads/searches when the environment supports them.
-99999999. Keep `.supa-ralph/IMPLEMENTATION_PLAN.md` current. Remove completed clutter when it becomes noisy.
-999999999. Use `git push` after a successful commit so the work is externally visible.
-9999999999. Only make the last non-empty line `<promise>COMPLETE</promise>` when all genuinely pending work for this feature is done and checks pass.
+9999999. When authoring or editing documentation, capture the *why* — the problem or constraint behind the change — not only the outcome.
+99999999. Prefer the strongest reasoning available for architecture and debugging, and use parallel subagents or parallel reads/searches when the environment supports them.
+999999999. Keep `.supa-ralph/IMPLEMENTATION_PLAN.md` current. Remove completed clutter when it becomes noisy.
+9999999999. Use `git push` after a successful commit so the work is externally visible.
+99999999999. Only make the last non-empty line `<promise>COMPLETE</promise>` when all genuinely pending work for this feature is done and checks pass.

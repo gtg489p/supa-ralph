@@ -20,8 +20,18 @@ MSG
   fi
 }
 
-last_non_empty_line() {
-  awk 'NF { line=$0 } END { print line }'
+strip_wrappers() {
+  sed -e 's/\r$//' -e 's/[[:space:]]*$//' -e 's/^`*//' -e 's/`*$//'
+}
+
+tail_non_empty() {
+  grep -v '^[[:space:]]*$' | tail -n 5
+}
+
+match_promise_tag() {
+  local tag=$1
+  local output=$2
+  printf '%s\n' "$output" | tail_non_empty | strip_wrappers | grep -qF "<promise>${tag}</promise>"
 }
 
 status() {
@@ -35,6 +45,7 @@ status() {
   printf 'completed=%s\n' "$completed"
   printf 'logs=%s\n' "$log_count"
   [[ -n "$latest_log" ]] && printf 'latest_log=%s\n' "$latest_log"
+  printf 'note=counts reflect checkbox-style items only (- [ ] / - [x])\n'
   if [[ -f "$latest_log" ]]; then
     printf '\n--- latest log tail ---\n'
     tail -n 20 "$latest_log"
@@ -77,12 +88,11 @@ while true; do
   ITERATION=$((ITERATION + 1))
   echo "===== SUPA RALPH $MODE iteration $ITERATION =====" | tee -a "$LOG_FILE"
   OUTPUT=$(claude --dangerously-skip-permissions --print "$(cat "$PROMPT_FILE")" 2>&1 | tee -a "$LOG_FILE") || true
-  LAST_LINE=$(printf '%s\n' "$OUTPUT" | last_non_empty_line)
-  if [[ "$LAST_LINE" == "<promise>COMPLETE</promise>" ]]; then
+  if match_promise_tag "COMPLETE" "$OUTPUT"; then
     echo "Build complete." | tee -a "$LOG_FILE"
     exit 0
   fi
-  if [[ "$LAST_LINE" == "<promise>PLAN_READY</promise>" ]]; then
+  if match_promise_tag "PLAN_READY" "$OUTPUT"; then
     echo "Plan ready." | tee -a "$LOG_FILE"
     exit 0
   fi

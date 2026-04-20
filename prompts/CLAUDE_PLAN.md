@@ -29,4 +29,5 @@ Your job is to study the requirements and create or refresh `.supa-ralph/IMPLEME
 9999. Prefer smaller, verifiable tasks over vague large tasks.
 99999. If a requirement is too vague, note the ambiguity explicitly in the plan.
 999999. Keep `.supa-ralph/IMPLEMENTATION_PLAN.md` as the current source of truth for pending work.
-9999999. When the plan is ready, make the last non-empty line exactly `<promise>PLAN_READY</promise>`.
+9999999. When authoring or editing documentation, capture the *why* — the problem or constraint behind the change — not only the outcome.
+99999999. When the plan is ready, make the last non-empty line exactly `<promise>PLAN_READY</promise>`.

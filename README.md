@@ -163,6 +163,15 @@ supa-ralph/
 - prefer fresh Claude context each loop rather than giant uninterrupted sessions
 - do not assume a missing feature is missing, search first
 
+## Commit prefix override
+
+Supa Ralph commits default to `feat(ralph):` / `fix(ralph):`. Override with either:
+
+- `SUPA_RALPH_COMMIT_PREFIX=chore(myscope):` exported in the environment before running `ralph.sh build`
+- a `.supa-ralph/config` file line: `commit_prefix=chore(myscope):`
+
+Environment variable wins over config file. Without either, the default applies.
+
 ## References
 
 See `NOTICE.md` for source inspiration and attribution.
