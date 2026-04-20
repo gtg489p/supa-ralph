@@ -1,0 +1,6 @@
+# Supa Ralph Progress Log
+
+## Codebase Patterns
+- Add stable reusable learnings here.
+
+---
