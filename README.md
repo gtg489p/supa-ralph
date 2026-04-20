@@ -16,7 +16,7 @@ It starts from the solid autonomous loop idea in `snarktank/ralph`, then bakes i
 - a portable `.supa-ralph/` project kit
 - a Claude-focused Ralph loop script
 - PRD, planning, and building prompt files
-- templates for `AGENTS.md`, `IMPLEMENTATION_PLAN.md`, `progress.txt`, and `specs/`
+- templates for `AGENTS.md`, `IMPLEMENTATION_PLAN.md`, `PRD_TEMPLATE.md`, `progress.txt`, and `specs/`
 - upgraded docs so future sessions know how to run the method without prior chat context
 - copied/adapted Ralph skills for PRD creation and PRD-to-JSON conversion
 
