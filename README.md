@@ -163,6 +163,12 @@ supa-ralph/
 - prefer fresh Claude context each loop rather than giant uninterrupted sessions
 - do not assume a missing feature is missing, search first
 
+## Log retention
+
+Each `plan` or `build` invocation writes a timestamped log under `.supa-ralph/logs/`. Left alone, these accumulate quickly. Before starting a new run the loop prunes the oldest entries down to `SUPA_RALPH_LOG_KEEP` files (default 20); set the variable to a larger number to keep more, or to `0` to disable pruning entirely.
+
+Recommended: add `.supa-ralph/logs/` to `.gitignore` in the target project — the logs are local telemetry, not source material, and committing them churns the repo.
+
 ## Commit prefix override
 
 Supa Ralph commits default to `feat(ralph):` / `fix(ralph):`. Override with either:

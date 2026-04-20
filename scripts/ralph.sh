@@ -10,14 +10,21 @@ LOG_DIR="$RALPH_HOME/logs"
 mkdir -p "$LOG_DIR"
 
 require_risk_ack() {
-  if [[ "${SUPA_RALPH_I_ACCEPT_RISK:-}" != "1" ]]; then
-    cat >&2 <<'MSG'
+  if [[ "${SUPA_RALPH_I_ACCEPT_RISK:-}" == "1" ]]; then
+    return 0
+  fi
+  if [[ -f "$RALPH_HOME/.risk-accepted" ]]; then
+    return 0
+  fi
+  cat >&2 <<'MSG'
 Supa Ralph runs Claude Code with --dangerously-skip-permissions.
 Run this only in a trusted or sandboxed environment.
-Re-run with SUPA_RALPH_I_ACCEPT_RISK=1 if you intend to proceed.
+Either export SUPA_RALPH_I_ACCEPT_RISK=1 for this invocation, or run
+`touch .supa-ralph/.risk-accepted` in this project to record a per-project
+opt-in. Env-var exports can leak across projects; the file marker stays
+scoped to the checkout it lives in.
 MSG
-    exit 1
-  fi
+  exit 1
 }
 
 strip_wrappers() {
@@ -66,6 +73,13 @@ require_risk_ack
 PROMPT_FILE="$RALPH_HOME/prompts/CLAUDE_${MODE^^}.md"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 LOG_FILE="$LOG_DIR/${MODE}-loop-${TIMESTAMP}.log"
+
+LOG_KEEP="${SUPA_RALPH_LOG_KEEP:-20}"
+if [[ "$LOG_KEEP" =~ ^[0-9]+$ && "$LOG_KEEP" -gt 0 ]]; then
+  # Prune oldest logs down to $LOG_KEEP before writing a new one.
+  ls -1t "$LOG_DIR"/*.log 2>/dev/null | tail -n +"$((LOG_KEEP + 1))" | xargs -r rm -f --
+fi
+
 ITERATION=0
 
 [[ -f "$PROMPT_FILE" ]] || { echo "missing prompt: $PROMPT_FILE" >&2; exit 1; }
