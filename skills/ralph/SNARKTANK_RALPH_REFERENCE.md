@@ -1,8 +1,13 @@
----
-name: ralph
-description: "Convert PRDs to prd.json format for the Ralph autonomous agent system. Use when you have an existing PRD and need to convert it to Ralph's JSON format. Triggers on: convert this prd, turn this into ralph format, create prd.json from this, ralph json."
-user-invocable: true
----
+# Reference: snarktank prd.json Ralph skill
+
+This file is an upstream reference document, not an installed user-invocable Supa Ralph skill.
+
+Important: Supa Ralph intentionally does not use `prd.json` as its runtime state machine. Its live state is carried by PRDs, specs, `IMPLEMENTATION_PLAN.md`, `progress.txt`, and `AGENTS.md`.
+
+Original source inspiration:
+- https://github.com/snarktank/ralph
+
+Below is preserved reference material from the upstream prd.json-oriented Ralph skill for comparison only.
 
 # Ralph PRD Converter
 

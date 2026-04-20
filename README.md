@@ -2,7 +2,7 @@
 
 Supa Ralph is a portable, PRD-first Ralph kit for Claude Code.
 
-It starts from the solid autonomous loop idea in `snarktank/ralph`, then bakes in the stronger operating guidance from the Ralph playbook so a fresh session can:
+It starts from the solid autonomous loop idea in `snarktank/ralph`, then bakes in stronger operating guidance from the Ralph playbook so a fresh session can:
 
 1. take a free-form feature idea,
 2. ask clarifying questions,
@@ -17,8 +17,15 @@ It starts from the solid autonomous loop idea in `snarktank/ralph`, then bakes i
 - a Claude-focused Ralph loop script
 - PRD, planning, and building prompt files
 - templates for `AGENTS.md`, `IMPLEMENTATION_PLAN.md`, `PRD_TEMPLATE.md`, `progress.txt`, and `specs/`
-- upgraded docs so future sessions know how to run the method without prior chat context
-- copied/adapted Ralph skills for PRD creation and PRD-to-JSON conversion
+- installed docs so future sessions can operate from inside the target repo
+- project-local Claude skill links for `supa-prd` and `supa-ralph`
+- rewritten guidance that preserves the strongest useful ideas without forcing `prd.json` as runtime state
+
+## Canonical trigger phrase
+
+Preferred phrase: **"Use Supa Ralph on this idea."**
+
+Aliases are fine, but this is the canonical name to document and reuse.
 
 ## Core operating model
 
@@ -37,9 +44,35 @@ Supa Ralph follows a three-stage flow:
 3. **Building**
    - implement the highest-value planned task
    - run checks
-   - commit
+   - commit and push
    - update plan and progress
    - repeat with fresh context until complete
+
+## Important runtime truth
+
+Each plan or build iteration is a **fresh Claude process**.
+
+That means memory does not carry forward automatically. Everything that matters must be written to disk in:
+- `tasks/`
+- `specs/`
+- `.supa-ralph/IMPLEMENTATION_PLAN.md`
+- `.supa-ralph/progress.txt`
+- `.supa-ralph/AGENTS.md`
+
+## Run this only in a sandbox
+
+Supa Ralph uses Claude Code with `--dangerously-skip-permissions` for autonomous execution.
+That is powerful and convenient, but it removes the normal approval boundary.
+
+**Do not treat this as safe to run casually on your laptop or a machine full of secrets.**
+Use it in a sandboxed or otherwise intentionally trusted environment.
+
+Recommended minimum posture:
+- run inside a disposable sandbox, VM, container, or tightly scoped dev box
+- use a repo-specific environment, not your entire personal machine context
+- keep secrets and unrelated credentials out of the working environment when possible
+
+The loop script requires `SUPA_RALPH_I_ACCEPT_RISK=1` before it will run plan/build mode.
 
 ## Quick start
 
@@ -55,11 +88,11 @@ git clone git@github.com:gtg489p/supa-ralph.git
 ./scripts/install-into-project.sh /path/to/your/project
 ```
 
-This creates a `.supa-ralph/` folder inside the target project.
+This creates a `.supa-ralph/` folder inside the target project, copies the docs into that kit, and creates Claude skill symlinks under `.claude/skills/` when safe to do so.
 
 ### 3. Create the PRD from a free-form idea
 
-Use `prompts/CLAUDE_PRD_DISCOVERY.md` as the operating contract for the first Claude session.
+Use `.supa-ralph/prompts/CLAUDE_PRD_DISCOVERY.md` as the operating contract for the first Claude session.
 
 Expected output:
 - `tasks/prd-<feature>.md`
@@ -69,7 +102,7 @@ Expected output:
 
 ```bash
 cd /path/to/your/project
-.supa-ralph/scripts/ralph.sh plan 1
+SUPA_RALPH_I_ACCEPT_RISK=1 .supa-ralph/scripts/ralph.sh plan 1
 ```
 
 Expected output:
@@ -79,28 +112,30 @@ Expected output:
 
 ```bash
 cd /path/to/your/project
-.supa-ralph/scripts/ralph.sh build 10
+SUPA_RALPH_I_ACCEPT_RISK=1 .supa-ralph/scripts/ralph.sh build 10
 ```
 
 Expected outputs over time:
 - code changes
-- commits
+- commits and pushes
 - updates to `.supa-ralph/IMPLEMENTATION_PLAN.md`
 - updates to `.supa-ralph/progress.txt`
 
+### 6. Check status without running the loop
+
+```bash
+cd /path/to/your/project
+.supa-ralph/scripts/ralph.sh status
+```
+
 ## Fresh-session assistant workflow
 
-When Nathan says something like:
-- "Go do Ralph Wiggum on this idea"
-- "Go get Supa Ralph"
-- "Use Super Ralph for this feature"
-
-The expected agent flow is:
+When Nathan says "Use Supa Ralph on this idea", the expected agent flow is:
 
 1. capture the free-form idea
 2. ask clarifying questions only where necessary
 3. write a proper PRD in `tasks/`
-4. install or load `.supa-ralph/`
+4. load `.supa-ralph/README.md`, `.supa-ralph/docs/`, and `.supa-ralph/prompts/`
 5. run a planning pass
 6. run build loops until complete
 
@@ -126,6 +161,7 @@ supa-ralph/
 - keep reusable learnings in `progress.txt` and `AGENTS.md`
 - use tests and checks as backpressure before commit
 - prefer fresh Claude context each loop rather than giant uninterrupted sessions
+- do not assume a missing feature is missing, search first
 
 ## References
 

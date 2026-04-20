@@ -7,4 +7,4 @@
 - None yet.
 
 ## Risks / Notes
-- Add discoveries here as the planning and build loops learn more.
+- Add discoveries here as planning and build loops learn more.

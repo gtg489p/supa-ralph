@@ -1,34 +1,47 @@
 You are in build mode.
 
+You are running in a fresh Claude process.
+You do not remember prior iterations unless the information is written to disk.
+Everything that matters is on disk.
+
 Your job is to implement the next most important planned increment from `.supa-ralph/IMPLEMENTATION_PLAN.md`.
 
-## Inputs to study
+## Orientation first
 
-- `tasks/*.md`
-- `specs/*.md`
-- `.supa-ralph/IMPLEMENTATION_PLAN.md`
-- `.supa-ralph/progress.txt`
-- the real codebase
+0a. Study `tasks/*.md` to understand the required behavior.
+0b. Study `specs/*.md` if they exist.
+0c. Study `.supa-ralph/IMPLEMENTATION_PLAN.md`.
+0d. Study `.supa-ralph/progress.txt` and `.supa-ralph/AGENTS.md` for reusable learnings and run commands.
+0e. Search the real codebase before changing anything. Do not assume a missing feature is missing.
 
 ## What to do
 
-1. Read the plan and choose the highest-value unfinished increment.
-2. Search before changing code. Do not assume a missing feature is missing.
-3. Implement the selected increment fully.
-4. Run appropriate checks for the touched area.
-5. Update `.supa-ralph/IMPLEMENTATION_PLAN.md` with what changed.
-6. Append learnings to `.supa-ralph/progress.txt`.
-7. Commit the work if checks pass.
+1. Choose the highest-value unfinished increment from `.supa-ralph/IMPLEMENTATION_PLAN.md`.
+2. Verify it is not already implemented.
+3. Implement that increment fully.
+4. Run the appropriate checks for the touched area.
+5. Update `.supa-ralph/IMPLEMENTATION_PLAN.md` with what changed and what remains.
+6. Append reusable learnings to `.supa-ralph/progress.txt`.
+7. If you discover stable operational knowledge, update `.supa-ralph/AGENTS.md` briefly.
+8. If checks pass, commit and push the work.
 
-## Rules
+## Commit contract
 
-- One meaningful increment per iteration.
-- No placeholders if the real implementation is feasible.
-- Keep `AGENTS.md` operational and brief.
-- Put status in the plan and progress log, not in random docs.
-- If you discover adjacent bugs, either fix them or record them in the plan.
+Use a structured commit message in this format:
 
-## Completion
+`feat(ralph): <completed increment summary>`
 
-If all planned items are complete and checks pass, end with:
-<promise>COMPLETE</promise>
+If the change is a fix rather than a feature increment, use:
+
+`fix(ralph): <completed increment summary>`
+
+## Guardrails
+
+999. One meaningful increment per iteration.
+9999. No placeholders if the real implementation is feasible.
+99999. Keep `AGENTS.md` operational and brief. Status belongs in the plan and progress log.
+999999. If unrelated tests are already failing, either fix them if they block your increment or document them clearly in the plan.
+9999999. Prefer the strongest reasoning available for architecture and debugging, and use parallel subagents or parallel reads/searches when the environment supports them.
+99999999. Keep `.supa-ralph/IMPLEMENTATION_PLAN.md` current. Remove completed clutter when it becomes noisy.
+999999999. Use `git push` after a successful commit so the work is externally visible.
+9999999999. Only make the last non-empty line `<promise>COMPLETE</promise>` when all genuinely pending work for this feature is done and checks pass.

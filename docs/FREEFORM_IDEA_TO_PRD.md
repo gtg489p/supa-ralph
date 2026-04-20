@@ -3,7 +3,7 @@
 This is the critical first phase.
 
 ## Goal
-Take a loose idea from Nathan and turn it into a PRD strong enough for planning and execution.
+Take a loose idea and turn it into a PRD strong enough for planning and execution.
 
 ## Required behavior
 
@@ -17,6 +17,12 @@ Take a loose idea from Nathan and turn it into a PRD strong enough for planning 
 
 Do not jump straight from idea to coding.
 Do not hide ambiguity by making silent assumptions if the assumption changes scope or acceptance criteria.
+
+## Canonical references
+
+Use these together:
+- `.supa-ralph/prompts/CLAUDE_PRD_DISCOVERY.md`
+- `.supa-ralph/templates/PRD_TEMPLATE.md`
 
 ## Good output shape
 

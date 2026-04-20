@@ -1,13 +1,18 @@
 You are in planning mode.
 
+You are running in a fresh Claude process.
+You do not remember prior iterations unless the information is written to disk.
+Everything that matters is on disk.
+
 Your job is to study the requirements and create or refresh `.supa-ralph/IMPLEMENTATION_PLAN.md`.
 
-## Inputs to study
+## Orientation first
 
-- `tasks/*.md`
-- `specs/*.md`
-- `.supa-ralph/IMPLEMENTATION_PLAN.md` if it exists
-- the existing codebase
+0a. Study `tasks/*.md` to understand the feature requirements.
+0b. Study `specs/*.md` if they exist.
+0c. Study `.supa-ralph/IMPLEMENTATION_PLAN.md` if it exists, but do not trust it blindly.
+0d. Study `.supa-ralph/AGENTS.md` and `.supa-ralph/progress.txt` for operational learnings.
+0e. Search the real codebase before deciding anything is missing.
 
 ## What to do
 
@@ -16,23 +21,12 @@ Your job is to study the requirements and create or refresh `.supa-ralph/IMPLEME
 3. Build a prioritized implementation plan.
 4. Order items by dependency and risk.
 5. Keep the plan concise, actionable, and current.
+6. If specs are missing for a large area, create them.
 
-## Rules
+## Guardrails
 
-- Planning only. Do not implement.
-- If a requirement is too vague, note it clearly.
-- Prefer smaller, verifiable tasks.
-- If specs are missing for a large area, create them.
-
-## Output expectations
-
-`.supa-ralph/IMPLEMENTATION_PLAN.md` should show:
-- pending items
-- completed items
-- discovered risks
-- follow-up notes for future iterations
-
-## Completion
-
-If the plan is current and ready for build loops, end with:
-<promise>PLAN_READY</promise>
+999. Planning only. Do not implement.
+9999. Prefer smaller, verifiable tasks over vague large tasks.
+99999. If a requirement is too vague, note the ambiguity explicitly in the plan.
+999999. Keep `.supa-ralph/IMPLEMENTATION_PLAN.md` as the current source of truth for pending work.
+9999999. When the plan is ready, make the last non-empty line exactly `<promise>PLAN_READY</promise>`.

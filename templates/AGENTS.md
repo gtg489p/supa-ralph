@@ -17,6 +17,10 @@ Store stable project-specific rules that future Ralph iterations should know.
 - narrative progress
 - story-specific notes already captured elsewhere
 
+## Important habit
+Populate this file early with the real commands for the project, for example typecheck, test, build, lint, or app-run commands.
+That makes later fresh-context iterations much stronger.
+
 ## Related files
 - `.supa-ralph/IMPLEMENTATION_PLAN.md` for current work tracking
 - `.supa-ralph/progress.txt` for iteration learnings

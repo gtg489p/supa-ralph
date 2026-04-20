@@ -12,6 +12,18 @@ It is a disciplined feature-delivery funnel:
 5. implementation plan
 6. iterative build loop
 
+## One critical runtime truth
+
+Each planning or build iteration is a **fresh Claude process**.
+It does not remember prior loops unless those learnings were written to disk.
+
+Persistent project memory lives in:
+- `tasks/`
+- `specs/`
+- `.supa-ralph/IMPLEMENTATION_PLAN.md`
+- `.supa-ralph/progress.txt`
+- `.supa-ralph/AGENTS.md`
+
 ## Three phases
 
 ### Phase 1, discovery
@@ -28,7 +40,7 @@ Create or update `.supa-ralph/IMPLEMENTATION_PLAN.md`.
 ### Phase 3, building
 Implement one meaningful increment at a time.
 Run checks.
-Commit.
+Commit and push.
 Update plan and progress.
 Repeat until done.
 
@@ -42,6 +54,7 @@ Repeat until done.
 - Keep `AGENTS.md` short and operational.
 - Put status and discoveries in `.supa-ralph/progress.txt` and `.supa-ralph/IMPLEMENTATION_PLAN.md`.
 - A build iteration should finish one coherent increment, not half-implement five things.
+- Do not rely on hidden conversational memory. If it matters later, write it down now.
 
 ## When to create specs
 
@@ -54,3 +67,8 @@ Create `specs/*.md` when the feature naturally splits into distinct topics of co
 
 If the feature is small, the PRD may be enough.
 If the feature is large, specs are strongly preferred.
+
+## Safety posture
+
+Supa Ralph is intended for trusted, sandboxed, or intentionally scoped environments.
+Because the loop runs Claude Code in autonomous permissions-bypassed mode, your sandbox is your main safety boundary.
