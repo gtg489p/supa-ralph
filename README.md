@@ -90,7 +90,18 @@ git clone git@github.com:gtg489p/supa-ralph.git
 
 This creates a `.supa-ralph/` folder inside the target project, copies the docs into that kit, and creates Claude skill symlinks under `.claude/skills/` when safe to do so.
 
-### 3. Create the PRD from a free-form idea
+### 3. Bootstrap AGENTS.md from the target project
+
+Before running PRD discovery, let Supa Ralph scan the target project's build tooling and rewrite `.supa-ralph/AGENTS.md` with the real typecheck, test, build, lint, and run commands it finds:
+
+```bash
+cd /path/to/your/project
+SUPA_RALPH_I_ACCEPT_RISK=1 .supa-ralph/scripts/ralph.sh bootstrap-agents
+```
+
+Single-shot Claude invocation, not a loop. Inspects `package.json`, `pyproject.toml`, `Makefile`, `Cargo.toml`, etc., and preserves any human-authored sections already in `AGENTS.md`. Skip this step if you prefer to hand-author `AGENTS.md`.
+
+### 4. Create the PRD from a free-form idea
 
 Use `.supa-ralph/prompts/CLAUDE_PRD_DISCOVERY.md` as the operating contract for the first Claude session.
 
@@ -98,7 +109,7 @@ Expected output:
 - `tasks/prd-<feature>.md`
 - optionally `specs/*.md` if the idea naturally breaks into distinct topics of concern
 
-### 4. Run a planning pass
+### 5. Run a planning pass
 
 ```bash
 cd /path/to/your/project
@@ -108,7 +119,7 @@ SUPA_RALPH_I_ACCEPT_RISK=1 .supa-ralph/scripts/ralph.sh plan 1
 Expected output:
 - `.supa-ralph/IMPLEMENTATION_PLAN.md`
 
-### 5. Run the build loop
+### 6. Run the build loop
 
 ```bash
 cd /path/to/your/project
@@ -121,7 +132,7 @@ Expected outputs over time:
 - updates to `.supa-ralph/IMPLEMENTATION_PLAN.md`
 - updates to `.supa-ralph/progress.txt`
 
-### 6. Check status without running the loop
+### 7. Check status without running the loop
 
 ```bash
 cd /path/to/your/project

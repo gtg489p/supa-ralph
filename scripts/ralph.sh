@@ -102,20 +102,30 @@ if [[ "$MODE" == "status" ]]; then
   exit 0
 fi
 
-if [[ "$MODE" != "plan" && "$MODE" != "build" ]]; then
-  echo "usage: .supa-ralph/scripts/ralph.sh [plan|build|status] [max_iterations]" >&2
+if [[ "$MODE" != "plan" && "$MODE" != "build" && "$MODE" != "bootstrap-agents" ]]; then
+  echo "usage: .supa-ralph/scripts/ralph.sh [plan|build|bootstrap-agents|status] [max_iterations]" >&2
   exit 2
 fi
 
 require_risk_ack
-PROMPT_FILE="$RALPH_HOME/prompts/CLAUDE_${MODE^^}.md"
+if [[ "$MODE" == "bootstrap-agents" ]]; then
+  PROMPT_FILE="$RALPH_HOME/prompts/CLAUDE_BOOTSTRAP_AGENTS.md"
+else
+  PROMPT_FILE="$RALPH_HOME/prompts/CLAUDE_${MODE^^}.md"
+fi
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 LOG_FILE="$LOG_DIR/${MODE}-loop-${TIMESTAMP}.log"
 
 LOG_KEEP="${SUPA_RALPH_LOG_KEEP:-20}"
 if [[ "$LOG_KEEP" =~ ^[0-9]+$ && "$LOG_KEEP" -gt 0 ]]; then
   # Prune oldest logs down to $LOG_KEEP before writing a new one.
-  ls -1t "$LOG_DIR"/*.log 2>/dev/null | tail -n +"$((LOG_KEEP + 1))" | xargs -r rm -f --
+  # `find` tolerates an empty log dir (no exit 2 tripping pipefail the way
+  # `ls` does); sort by mtime desc, drop the newest $LOG_KEEP, delete the rest.
+  find "$LOG_DIR" -maxdepth 1 -type f -name '*.log' -printf '%T@ %p\n' 2>/dev/null \
+    | sort -rn \
+    | tail -n "+$((LOG_KEEP + 1))" \
+    | cut -d' ' -f2- \
+    | xargs -r rm -f --
 fi
 
 ITERATION=0
@@ -131,6 +141,16 @@ cd "$PROJECT_ROOT"
   echo "log_file=$LOG_FILE"
   echo "---"
 } | tee -a "$LOG_FILE"
+
+if [[ "$MODE" == "bootstrap-agents" ]]; then
+  echo "===== SUPA RALPH bootstrap-agents (single-shot) =====" | tee -a "$LOG_FILE"
+  if ! run_claude_with_retry "$PROMPT_FILE" "$LOG_FILE"; then
+    echo "bootstrap-agents: claude invocation failed" | tee -a "$LOG_FILE" >&2
+    exit 1
+  fi
+  echo "bootstrap-agents: complete — review .supa-ralph/AGENTS.md" | tee -a "$LOG_FILE"
+  exit 0
+fi
 
 while true; do
   if [[ "$MAX_ITERATIONS" != "0" && "$ITERATION" -ge "$MAX_ITERATIONS" ]]; then
