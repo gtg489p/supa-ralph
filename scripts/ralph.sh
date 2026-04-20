@@ -41,6 +41,44 @@ match_promise_tag() {
   printf '%s\n' "$output" | tail_non_empty | strip_wrappers | grep -qF "<promise>${tag}</promise>"
 }
 
+run_claude_with_retry() {
+  # Invoke Claude Code up to 3 times with 5s/15s backoff between attempts.
+  # A transient rate-limit or network blip no longer silently wastes the
+  # whole outer iteration; one visible retry cycle is preferable to a
+  # spurious "no promise tag" loop step.
+  local prompt_file=$1
+  local log_file=$2
+  local max_attempts=3
+  local -a sleeps=(5 15)
+  local attempt exit_code sleep_for tmp
+  tmp=$(mktemp)
+  for (( attempt = 1; attempt <= max_attempts; attempt++ )); do
+    set +e
+    claude --dangerously-skip-permissions --print "$(cat "$prompt_file")" >"$tmp" 2>&1
+    exit_code=$?
+    set -e
+    cat "$tmp" >>"$log_file"
+    if [[ "$exit_code" -eq 0 ]] \
+       && ! grep -qiE 'rate[- ]?limit|(^|[^0-9])429([^0-9]|$)|temporarily unavailable|connection (reset|refused|timed? out)|econnreset|etimedout|network error' "$tmp"; then
+      cat "$tmp"
+      rm -f "$tmp"
+      return 0
+    fi
+    if [[ "$attempt" -lt "$max_attempts" ]]; then
+      sleep_for="${sleeps[$((attempt - 1))]}"
+      # Route retry notices to stderr + log only — never stdout —
+      # so they don't pollute the captured output that match_promise_tag scans.
+      local msg="[retry $attempt/$max_attempts] claude invocation failed (exit=$exit_code); sleeping ${sleep_for}s before next attempt"
+      echo "$msg" >>"$log_file"
+      echo "$msg" >&2
+      sleep "$sleep_for"
+    fi
+  done
+  cat "$tmp"
+  rm -f "$tmp"
+  return "$exit_code"
+}
+
 status() {
   local pending=0 completed=0 log_count=0 latest_log=""
   [[ -f "$PLAN_FILE" ]] && pending=$(grep -c '^- \[ \]' "$PLAN_FILE" || true)
@@ -101,7 +139,7 @@ while true; do
   fi
   ITERATION=$((ITERATION + 1))
   echo "===== SUPA RALPH $MODE iteration $ITERATION =====" | tee -a "$LOG_FILE"
-  OUTPUT=$(claude --dangerously-skip-permissions --print "$(cat "$PROMPT_FILE")" 2>&1 | tee -a "$LOG_FILE") || true
+  OUTPUT=$(run_claude_with_retry "$PROMPT_FILE" "$LOG_FILE") || true
   if match_promise_tag "COMPLETE" "$OUTPUT"; then
     echo "Build complete." | tee -a "$LOG_FILE"
     exit 0
